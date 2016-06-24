@@ -5,7 +5,7 @@
     "type" : "git",
     "url" : "https://github.com/marc-hughes/serverless-dynamodb-fixtures-plugin.git"
   },
-  "description": "Helper to preload static data into dynamodb, primarily aimed at helping you write tests for your accessor layer.",
+  "description": "Serverless plugin to preload static data into dynamodb, primarily aimed at helping you load data to test your accessor layer.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
