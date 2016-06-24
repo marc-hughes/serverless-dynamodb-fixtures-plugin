@@ -1,6 +1,8 @@
 # serverless-dynamodb-fixtures-plugin
 
-This will help you load up some static data into your DynamoDB tables.
+This is a plugin for [Serverless](http://serverless.com/)
+
+It will help you load up some static data into your DynamoDB tables.
 
 Useful for either canned data or to provide consistent test-data across environments.
 
@@ -79,6 +81,7 @@ Serverless: Writing 21 entries
 
 If it starts taking a long time, you're probably hitting your write throughput limit, just wait and it should finish.
 
+Optionally specify stage and/or region
 
 **NOTE:** This uses a dynamoDB batch write operation which completely overwrites the items specified.  If you have records
 with the same keys, they will be overwritten.  If you have properties in your existing data that don't exist in the 
