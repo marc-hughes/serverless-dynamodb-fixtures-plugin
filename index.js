@@ -7,6 +7,7 @@ module.exports = function(S) {
         Promise      = require('bluebird'),
         fs           = require('fs'),
         async        = require('async'),
+        AWS = require('aws-sdk'),
         fixturesPath = path.join(S.config.projectPath, 'fixtures');
 
 
@@ -50,16 +51,11 @@ module.exports = function(S) {
                 .then(_this._validateParams)
                 .then(_this._loadFixtures)
                 .then(function() {
-
-                    _this._spinner.stop(true);
                     SCli.log('Done loading.');
-
                     return _this.evt;
 
                 });
-
         }
-
 
         _prompt() {
 
@@ -68,14 +64,14 @@ module.exports = function(S) {
             return _this.cliPromptSelectStage('Choose Stage: ', _this.evt.options.stage, true)
                 .then(stage => {
                 _this.evt.options.stage = stage;
-            Promise.resolve();
-        })
-        .then(function(){
-                return _this.cliPromptSelectRegion('Choose Region: ', false, true, _this.evt.options.region, _this.evt.options.stage)
-                    .then(region => {
-                    _this.evt.options.region = region;
                 Promise.resolve();
-            });
+            })
+            .then(function(){
+                    return _this.cliPromptSelectRegion('Choose Region: ', false, true, _this.evt.options.region, _this.evt.options.stage)
+                        .then(region => {
+                        _this.evt.options.region = region;
+                    Promise.resolve();
+                });
             });
 
         }
@@ -101,12 +97,49 @@ module.exports = function(S) {
 
             _this.project    = S.getProject();
             _this.aws        = S.getProvider('aws');
+            _this.dynamodb = new AWS.DynamoDB.DocumentClient({ region: _this.evt.options.region });
 
             return Promise.resolve();
         }
 
         _loadFixture(filename) {
+            let _this = this;
+
             SCli.log(`Loading fixtures/${filename}`);
+            var inputData = fs.readFileSync('fixtures/' + filename, 'utf8');
+
+            // TODO: I'm pretty sure there's a better way to render templates that actually use the full set of variables
+            inputData = inputData.replace(/\$\{SERVERLESS_STAGE\}/g, this.evt.options.stage);
+            inputData = inputData.replace(/\$\{SERVERLESS_PROJECT\}/g, this.project.name);
+            inputData = inputData.replace(/\$\{SERVERLESS_REGION\}/g, this.evt.options.region);
+
+            var importData = JSON.parse(inputData);
+            const batchWrite = Promise.promisify(_this.dynamodb.batchWrite.bind(_this.dynamodb))
+
+            let items = importData.entries.map(function(entry){
+                return {
+                    PutRequest: {
+                        Item: entry
+                    }
+                }
+            });
+            var request = {
+                RequestItems: {
+                }
+            };
+            // You can only batch-write 25 entries at a time.
+
+            var batches = [];
+            for(var i = 0 ; i < items.length ; i += 25) {
+                batches.push(items.slice(i, i+25));
+            }
+
+            return Promise.each(batches,(batch) => {
+                SCli.log(`Writing ${batch.length} entries`);
+                _this._spinner.start();
+                request.RequestItems[importData.tableName] = batch;
+                return batchWrite(request).then(() => _this._spinner.stop(true))
+            });
         }
 
         _loadFixtures() {
@@ -116,15 +149,10 @@ module.exports = function(S) {
             SCli.log('Loading fixtures to stage "' + _this.evt.options.stage + '" in region "' + _this.evt.options.region + '"...');
 
             _this._spinner = SCli.spinner();
-            _this._spinner.start();
             
             let files = fs.readdirSync(fixturesPath);
-            async.each(files,this._loadFixture)
-            return;
+            return Promise.each(files, this._loadFixture.bind(this));
         }
-
-
-
     }
     return DynamoDbFixtures;
 };

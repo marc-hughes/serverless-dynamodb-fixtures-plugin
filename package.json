@@ -1,22 +1,26 @@
 {
   "name": "serverless-dynamodb-fixtures-plugin",
   "version": "0.0.1",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/marc-hughes/serverless-dynamodb-fixtures-plugin.git"
+  },
   "description": "Helper to preload static data into dynamodb, primarily aimed at helping you write tests for your accessor layer.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "mocha",
     "serverless",
     "dynamodb",
+    "test data",
+    "fixtures",
     "testing"
   ],
   "author": "Marc Hughes <marc.hughes@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "async": "^2.0.0-rc.6",
-    "bluebird": "^3.4.1",
-    "dynafixtures": "^0.2.5"
+    "bluebird": "^3.4.1"
   }
 }
