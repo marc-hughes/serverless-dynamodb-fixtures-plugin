@@ -63,16 +63,16 @@ module.exports = function(S) {
 
             return _this.cliPromptSelectStage('Choose Stage: ', _this.evt.options.stage, true)
                 .then(stage => {
-                _this.evt.options.stage = stage;
-                Promise.resolve();
-            })
-            .then(function(){
+                    _this.evt.options.stage = stage;
+                    Promise.resolve();
+                })
+                .then(function(){
                     return _this.cliPromptSelectRegion('Choose Region: ', false, true, _this.evt.options.region, _this.evt.options.stage)
                         .then(region => {
-                        _this.evt.options.region = region;
-                    Promise.resolve();
+                            _this.evt.options.region = region;
+                            Promise.resolve();
+                        });
                 });
-            });
 
         }
 
@@ -149,7 +149,7 @@ module.exports = function(S) {
             SCli.log('Loading fixtures to stage "' + _this.evt.options.stage + '" in region "' + _this.evt.options.region + '"...');
 
             _this._spinner = SCli.spinner();
-            
+
             let files = fs.readdirSync(fixturesPath);
             return Promise.each(files, this._loadFixture.bind(this));
         }
