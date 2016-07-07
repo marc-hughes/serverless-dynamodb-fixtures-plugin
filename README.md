@@ -6,6 +6,8 @@ It will help you load up some static data into your DynamoDB tables.
 
 Useful for either canned data or to provide consistent test-data across environments.
 
+This is for serverless versions before v1 - See the master branch for newer versions.
+
 ## Installation
 
 > npm install serverless-dynamodb-fixtures-plugin --save
@@ -26,7 +28,7 @@ Create a **fixtures** directory in the root of your project.  Populate it with j
 
 ````
 {
-    "tableName": YOURTABLENAME, 
+    "tableName": YOURTABLENAME,
     "entries":[
         ENTRIES TO ADD
     ]
@@ -39,7 +41,7 @@ Here's an example with some data in it.
 
 ````
 {
-  "tableName": "${SERVERLESS_STAGE}-${SERVERLESS_PROJECT}-car", 
+  "tableName": "${SERVERLESS_STAGE}-${SERVERLESS_PROJECT}-car",
   "entries":[
     {"id":"test-car-1", "make":"Subaru Forrester", "mileage":32000, "year":2010},
     {
@@ -84,7 +86,7 @@ If it starts taking a long time, you're probably hitting your write throughput l
 Optionally specify stage and/or region
 
 **NOTE:** This uses a dynamoDB batch write operation which completely overwrites the items specified.  If you have records
-with the same keys, they will be overwritten.  If you have properties in your existing data that don't exist in the 
+with the same keys, they will be overwritten.  If you have properties in your existing data that don't exist in the
 JSON, they will be lost.
 
 
